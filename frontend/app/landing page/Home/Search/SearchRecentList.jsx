@@ -20,7 +20,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const SearchRecentList = () => {
+const SearchRecentList = ({ onSelectRecent }) => {
   return (
     <motion.div
       variants={containerVariants}
@@ -40,7 +40,11 @@ const SearchRecentList = () => {
             <motion.div
               key={item.id}
               variants={itemVariants}
-              className="flex items-center justify-between gap-4 py-3"
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelectRecent?.(item.title);
+              }}
+              className="flex items-center justify-between gap-4 py-3 cursor-pointer hover:bg-gray-50/80 px-2 rounded-lg transition-colors"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div className="flex w-9 h-9 shrink-0 items-center justify-center rounded-full bg-[#F2F4FF]">

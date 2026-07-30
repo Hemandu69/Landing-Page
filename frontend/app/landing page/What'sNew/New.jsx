@@ -40,13 +40,16 @@ const New = () => {
       <div className="mx-auto max-w-[1500px]">
         {/* Header */}
 
-        <div className="flex items-start justify-between px-22">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-8 xl:px-22">
           <div>
             <h2
               className="
-                text-[35px]
+                text-[26px]
+                sm:text-[32px]
+                lg:text-[35px]
                 font-bold
-                leading-[30px]
+                leading-tight
+                lg:leading-[30px]
                 text-[#111827]
               "
             >
@@ -56,7 +59,8 @@ const New = () => {
             <p
               className="
                 mt-2
-                text-[15px]
+                text-[14px]
+                sm:text-[15px]
                 text-[#374151]
               "
             >
@@ -78,11 +82,13 @@ const New = () => {
               py-2
               shadow-lg
               shadow-black/20
-              text-[16px]
+              text-[15px]
+              sm:text-[16px]
               font-semibold
               text-[#374151]
               transition-all
               hover:bg-[#F7F7F7]
+              shrink-0
             "
           >
             View All
@@ -97,14 +103,16 @@ const New = () => {
           ref={sliderRef}
           onScroll={updateProgress}
           className="
-            mt-12
+            mt-8
+            sm:mt-12
             flex
             gap-5
             overflow-x-auto
-            px-22
+            px-4
+            sm:px-8
+            xl:px-22
             scroll-smooth
             scrollbar-hide
-            overflow-x-auto
             no-scrollbar
           "
         >
@@ -117,7 +125,7 @@ const New = () => {
         </div>
                 {/* Bottom Navigation */}
 
-        <div className="mt-14 flex items-center justify-between px-20">
+        <div className="mt-8 sm:mt-14 flex items-center justify-between px-4 sm:px-8 xl:px-20">
           {/* Left Arrow */}
 
           <button
@@ -135,6 +143,7 @@ const New = () => {
               text-[#374151]
               transition-all
               hover:bg-[#F4F4F4]
+              shrink-0
             "
           >
             <ArrowLeft size={24} />
@@ -144,7 +153,9 @@ const New = () => {
 
           <div
             className="
-              mx-100
+              mx-4
+              sm:mx-16
+              xl:mx-100
               h-[6px]
               flex-1
               overflow-hidden

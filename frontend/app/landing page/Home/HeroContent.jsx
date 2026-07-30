@@ -33,16 +33,24 @@ const HeroContent = ({ heroState }) => {
           >
             <h1
               className="
-                mt-10
-                text-[50px]
+                mt-6
+                sm:mt-10
+                text-[32px]
+                sm:text-[40px]
+                lg:text-[50px]
                 font-bold
-                leading-[50px]
-                tracking-[-2px]
+                leading-[38px]
+                sm:leading-[46px]
+                lg:leading-[50px]
+                tracking-[-1px]
+                lg:tracking-[-2px]
                 text-[#111827]
+                px-4
+                sm:px-0
               "
             >
               Discover Opportunities. Build
-              <br />
+              <br className="hidden sm:block" />
               Skills.
               <span className="text-[#6656D9]">
                 {" "}
@@ -55,9 +63,15 @@ const HeroContent = ({ heroState }) => {
                 mx-auto
                 mt-2
                 max-w-[800px]
-                text-[20px]
-                leading-[30px]
+                text-[15px]
+                sm:text-[18px]
+                lg:text-[20px]
+                leading-[22px]
+                sm:leading-[26px]
+                lg:leading-[30px]
                 text-[#4B5563]
+                px-4
+                sm:px-0
               "
             >
               Find internships, volunteering, events, competitions, learning
@@ -74,15 +88,19 @@ const HeroContent = ({ heroState }) => {
           >
             <h2
               className="
-                mt-20
-                text-[42px]
+                mt-10
+                sm:mt-16
+                lg:mt-20
+                text-[32px]
                 font-bold
-                leading-none
-                tracking-[-1.8px]
+                leading-tight
+                tracking-[-1px]
                 text-[#111827]
                 sm:text-[54px]
                 lg:text-[72px]
                 xl:whitespace-nowrap
+                px-4
+                sm:px-0
               "
             >
               What are you <span className="text-[#6656D9]">looking</span>{" "}
@@ -94,11 +112,15 @@ const HeroContent = ({ heroState }) => {
                 mx-auto
                 mt-3
                 max-w-[980px]
-                text-[18px]
-                leading-7
+                text-[15px]
+                leading-6
                 text-[#596278]
+                sm:text-[18px]
+                sm:leading-7
                 lg:text-[24px]
                 lg:leading-9
+                px-4
+                sm:px-0
               "
             >
               Explore internships, volunteer work, competitions, learning

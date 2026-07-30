@@ -1,3 +1,3 @@
-﻿# Profile routes placeholder
-pass
+from fastapi import APIRouter
 
+router = APIRouter(prefix="/profile", tags=["Profile"])

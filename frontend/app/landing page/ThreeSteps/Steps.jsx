@@ -48,15 +48,15 @@ const steps = [
 
 const Steps = () => {
   return (
-    <section className="bg-[#261F47] ">
-      <div className="mx-auto max-w-[1280px] px-2">
+    <section className="bg-[#261F47] px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-[1280px]">
         {/* Sticky Heading */}
-        <div className="sticky top-0 z-5 bg-[#261F47] pt-20 pb-8">
-          <h2 className="text-[40px] font-bold leading-[40px] text-white">
+        <div className="sticky top-0 z-5 bg-[#261F47] pt-6 sm:pt-12 lg:pt-20 pb-4 sm:pb-8">
+          <h2 className="text-[26px] sm:text-[34px] lg:text-[40px] font-bold leading-tight lg:leading-[40px] text-white">
             Three steps to get started
           </h2>
 
-          <p className="mt-4 max-w-[800px] text-[18px] leading-[25px] text-white/80">
+          <p className="mt-2 sm:mt-4 max-w-[800px] text-[14px] sm:text-[16px] lg:text-[18px] leading-[22px] sm:leading-[25px] text-white/80">
             Getting started is simple. Create your profile, explore opportunities
             that match your interests, and begin your journey towards learning,
             volunteering, and making a meaningful impact.
@@ -64,16 +64,17 @@ const Steps = () => {
         </div>
 
         {/* Sticky Cards */}
-        <div className="relative mt-20 h-[134vh]">
+        <div className="relative mt-8 sm:mt-14 lg:mt-20 h-auto lg:h-[134vh] flex flex-col gap-6 lg:gap-0 lg:block">
           {steps.map((item, index) => (
             <div
               key={item.id}
-              className="sticky"
+              className={`lg:sticky mb-6 lg:mb-0 ${
+                index === 1 ? "lg:ml-[90px]" : index === 2 ? "lg:ml-[180px]" : ""
+              }`}
               style={{
                 top: "250px",
                 zIndex: item.zIndex,
                 marginTop: index === 0 ? 0 : "90px",
-                marginLeft: `${index * 90}px`,
               }}
             >
               <StepsCard {...item} />

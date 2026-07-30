@@ -203,12 +203,12 @@ export const LoginModal: React.FC = () => {
           />
 
           {/* Floating Navigation Pill Button (Top Left outside modal card) */}
-          <div id="floating-nav-button" className="absolute top-10 left-10 z-20">
+          <div id="floating-nav-button" className="absolute top-4 left-4 sm:top-10 sm:left-10 z-20">
             {step === "INPUT" ? (
               <button
                 type="button"
                 onClick={closeLoginModal}
-                className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
+                className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
               >
                 <ArrowLeft size={18} />
                 <span>Go to Home</span>
@@ -225,7 +225,7 @@ export const LoginModal: React.FC = () => {
                     setOtpError(null);
                   }
                 }}
-                className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
+                className="flex items-center gap-2 rounded-full border border-gray-300 bg-white px-4 sm:px-5 py-2 sm:py-2.5 text-[13px] sm:text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-50 active:scale-[0.98] cursor-pointer"
               >
                 <ArrowLeft size={18} />
                 <span>Back</span>
@@ -243,8 +243,8 @@ export const LoginModal: React.FC = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className={`relative z-10 w-full overflow-hidden rounded-[32px] border border-gray-100/80 bg-[#F3F5FC] p-8 shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-all duration-300 ${
-              step === "ONBOARDING" ? "max-w-[560px]" : "max-w-[450px]"
+            className={`relative z-10 w-full overflow-hidden rounded-[28px] sm:rounded-[32px] border border-gray-100/80 bg-[#F3F5FC] p-5 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-all duration-300 ${
+              step === "ONBOARDING" ? "max-w-[560px]" : "max-w-[calc(100vw-32px)] sm:max-w-[450px]"
             }`}
           >
             {/* Step 1: Identifier Input */}

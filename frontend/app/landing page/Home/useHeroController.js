@@ -14,11 +14,6 @@ const useHeroController = () => {
   useLayoutEffect(() => () => context.current?.revert(), []);
 
   const startTimeline = useCallback(() => {
-    if (heroState === HERO_STATES.EXPANDED) {
-      setShowResults(true);
-      return;
-    }
-
     if (heroState !== HERO_STATES.DEFAULT) return;
 
     setHeroState(HERO_STATES.TRANSITIONING);
@@ -27,37 +22,51 @@ const useHeroController = () => {
     context.current = gsap.context(() => {
       const section = ".hero-search-section";
       const width = ".hero-search-width";
-      const card = ".hero-search-card";
-      const bar = ".hero-search-bar";
       const reveals = ".hero-search-reveal";
 
       timeline.current = gsap.timeline({
-        defaults: { ease: "power3.inOut", duration: 0.8 },
-        onComplete: () => setHeroState(HERO_STATES.EXPANDED),
+        defaults: { ease: "power2.out", duration: 1.2 },
+        onComplete: () => {
+          setHeroState(HERO_STATES.EXPANDED);
+          // Keep showResults = false so Phase 1 (RECENTS state) stays STABLE!
+        },
         onReverseComplete: () => {
           setShowResults(false);
-          gsap.set([section, width, card, bar], { clearProps: "all" });
+          gsap.set([section, width], { clearProps: "all" });
           setHeroState(HERO_STATES.DEFAULT);
         },
       });
 
       timeline.current
-        .to(section, { y: -66 }, 0)
-        .to(width, { maxWidth: 1160 }, 0)
-        .to(card, { height: "clamp(500px, 36.6vw, 750px)", borderRadius: 30 }, 0)
-        .to(bar, { height: "clamp(160px, 12vw, 240px)", borderRadius: 22 }, 0)
-        .fromTo(reveals, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.08 }, 0.25);
+        .to(section, { y: -36, duration: 1.2, ease: "power2.out" }, 0)
+        .to(width, { maxWidth: 1280, duration: 1.2, ease: "power2.out" }, 0)
+        .fromTo(
+          reveals,
+          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1, ease: "power2.out" },
+          0.4
+        );
     }, scope);
   }, [heroState]);
+
+  const triggerSearch = useCallback(() => {
+    if (heroState === HERO_STATES.DEFAULT) {
+      startTimeline();
+    }
+    setShowResults(true);
+  }, [heroState, startTimeline]);
 
   const closeTimeline = useCallback(() => {
     if (timeline.current) {
       setShowResults(false);
-      timeline.current.timeScale(1.3).reverse();
+      timeline.current.duration(1.2).reverse();
+    } else {
+      setHeroState(HERO_STATES.DEFAULT);
+      setShowResults(false);
     }
   }, []);
 
-  return { heroState, showResults, scope, startTimeline, closeTimeline };
+  return { heroState, showResults, setShowResults, scope, startTimeline, triggerSearch, closeTimeline };
 };
 
 export default useHeroController;

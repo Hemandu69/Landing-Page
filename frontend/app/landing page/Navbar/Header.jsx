@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronUp, ExternalLink, Search, Bell, LogOut, User } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Search, Bell, LogOut, User, Menu, X } from "lucide-react";
 import accessibilityIcon from "./Assets/Accessibility Icon.svg";
 import satyamevLogo from "./Assets/Satyamev.svg";
 import myBharatLogo from "./Assets/MyBharat.svg";
@@ -24,6 +24,8 @@ const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mobileExpandedSection, setMobileExpandedSection] = useState(null);
 
   const opportunitiesBtnRef = useRef(null);
   const communityBtnRef = useRef(null);
@@ -266,8 +268,10 @@ const Header = () => {
             </div>
 
             <a
-              href="#"
-              className="rounded-full border border-transparent px-4 py-1.5 transition-all text-[#1F2937] hover:bg-[#F3F4F6] hover:text-[#6656D9]"
+              href="https://yuva-beta.mybharats.in/success-stories"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center px-4 py-1.5 rounded-full border border-transparent transition-all text-[#1F2937] hover:bg-[#F3F4F6] hover:text-[#6656D9] hover:border-gray-300/80 hover:shadow-2xs cursor-pointer"
             >
               Success Stories
             </a>
@@ -434,9 +438,176 @@ const Header = () => {
                 </button>
               </>
             )}
+
+            {/* Hamburger Button for Mobile / Tablet */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+              aria-label="Toggle Navigation Menu"
+              className="flex h-10 w-10 lg:hidden items-center justify-center rounded-full border border-gray-200 text-[#1F2937] hover:bg-gray-100 transition-colors cursor-pointer"
+            >
+              {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile / Tablet Slide-over Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex lg:hidden bg-black/40 backdrop-blur-xs"
+          >
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="ml-auto w-full max-w-[340px] sm:max-w-[400px] h-full bg-white shadow-2xl flex flex-col overflow-y-auto"
+            >
+              {/* Mobile Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-[#FBFBFF]">
+                <div className="flex items-center gap-3">
+                  <Image src={satyamevLogo} alt="Satyamev" width={48} height={24} className="h-6 w-auto object-contain" />
+                  <Image src={myBharatLogo} alt="MY Bharat" width={75} height={32} className="h-7 w-auto object-contain" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Mobile Nav Links & Accordions */}
+              <div className="p-4 flex flex-col gap-3 flex-1">
+                {/* Opportunities Accordion */}
+                <div className="border-b border-gray-100 pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobileExpandedSection(prev => prev === 'opportunities' ? null : 'opportunities')}
+                    className="flex w-full items-center justify-between py-2 text-[16px] font-bold text-[#1F2937]"
+                  >
+                    <span>Opportunities</span>
+                    <ChevronDown size={18} className={`transition-transform ${mobileExpandedSection === 'opportunities' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {mobileExpandedSection === 'opportunities' && (
+                    <div className="pl-4 py-2 flex flex-col gap-2 text-[14px] text-[#4B5563]">
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Internships</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Volunteering</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Quiz & Essays</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Events</a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Community Accordion */}
+                <div className="border-b border-gray-100 pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobileExpandedSection(prev => prev === 'community' ? null : 'community')}
+                    className="flex w-full items-center justify-between py-2 text-[16px] font-bold text-[#1F2937]"
+                  >
+                    <span>Community</span>
+                    <ChevronDown size={18} className={`transition-transform ${mobileExpandedSection === 'community' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {mobileExpandedSection === 'community' && (
+                    <div className="pl-4 py-2 flex flex-col gap-2 text-[14px] text-[#4B5563]">
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Youth Center</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">All Organisations</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Gallery</a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Success Stories */}
+                <a
+                  href="https://yuva-beta.mybharats.in/success-stories"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-2 text-[16px] font-bold text-[#1F2937] border-b border-gray-100 hover:text-[#6656D9] transition-colors"
+                >
+                  Success Stories
+                </a>
+
+                {/* About Us Accordion */}
+                <div className="border-b border-gray-100 pb-2">
+                  <button
+                    type="button"
+                    onClick={() => setMobileExpandedSection(prev => prev === 'about' ? null : 'about')}
+                    className="flex w-full items-center justify-between py-2 text-[16px] font-bold text-[#1F2937]"
+                  >
+                    <span>About Us</span>
+                    <ChevronDown size={18} className={`transition-transform ${mobileExpandedSection === 'about' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {mobileExpandedSection === 'about' && (
+                    <div className="pl-4 py-2 flex flex-col gap-2 text-[14px] text-[#4B5563]">
+                      <a href="https://mybharat.gov.in/pages/about_mybharat" target="_blank" rel="noopener noreferrer" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">About MY Bharat</a>
+                      <a href="#" onClick={() => setIsMobileMenuOpen(false)} className="hover:text-[#6656D9]">Public Dashboard</a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Utility info */}
+                <div className="mt-4 p-3 rounded-2xl bg-[#F8F9FE] flex flex-col gap-2 text-[13px] text-[#6656D9]">
+                  <span className="font-semibold">Talk to Us: 14472</span>
+                  <a href="https://mybharat.gov.in/support" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 font-medium hover:underline">
+                    <span>Support</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+
+              {/* Mobile Footer Auth Buttons */}
+              <div className="p-4 border-t border-gray-100 bg-[#FBFBFF] flex flex-col gap-2">
+                {!isAuthenticated ? (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setIsMobileMenuOpen(false); openLoginModal("login"); }}
+                      className="w-full rounded-full border border-[#6355DC] py-2.5 text-[15px] font-bold text-[#6355DC] hover:bg-[#F3F5FC]"
+                    >
+                      Log In
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setIsMobileMenuOpen(false); openLoginModal("register"); }}
+                      className="w-full rounded-full bg-[#6355DC] py-2.5 text-[15px] font-bold text-white shadow-sm hover:bg-[#5243C9]"
+                    >
+                      Join MY Bharat
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 w-full rounded-full bg-[#6355DC] py-2.5 text-[15px] font-bold text-white"
+                    >
+                      <User size={18} />
+                      <span>My Dashboard</span>
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
+                      className="flex items-center justify-center gap-2 w-full rounded-full border border-red-200 py-2 text-[14px] font-bold text-red-600 hover:bg-red-50"
+                    >
+                      <LogOut size={16} />
+                      <span>Log Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

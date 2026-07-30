@@ -9,7 +9,7 @@ const tags = [
   "Volunteer For Viksit Bharat",
 ];
 
-const PopularTags = () => {
+const PopularTags = ({ onSelectTag }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -25,6 +25,10 @@ const PopularTags = () => {
         <button
           key={tag}
           type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelectTag?.(tag);
+          }}
           className="
             flex
             h-[36px]

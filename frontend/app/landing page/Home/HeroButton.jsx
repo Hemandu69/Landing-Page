@@ -34,8 +34,14 @@ const HeroButtons = ({ heroState }) => {
             className="
               mt-3
               flex
+              flex-col
+              sm:flex-row
+              items-center
               justify-center
-              gap-4
+              gap-3
+              sm:gap-4
+              px-4
+              sm:px-0
             "
           >
             <motion.button
@@ -53,15 +59,21 @@ const HeroButtons = ({ heroState }) => {
               className="
                 group
                 flex
+                w-full
+                sm:w-auto
                 items-center
+                justify-center
                 gap-2
                 rounded-full
                 border
                 border-gray-200
                 bg-white
-                px-8
-                py-4
-                text-[17px]
+                px-6
+                sm:px-8
+                py-3.5
+                sm:py-4
+                text-[16px]
+                sm:text-[17px]
                 font-semibold
                 text-[#2B3648]
                 shadow-[0_8px_24px_rgba(15,23,42,0.06)]
@@ -103,13 +115,21 @@ const HeroButtons = ({ heroState }) => {
                 delay: 0.05,
               }}
               className="
+                flex
+                w-full
+                sm:w-auto
+                items-center
+                justify-center
                 rounded-full
                 border
                 border-gray-200
                 bg-white
-                px-8
-                py-4
-                text-[17px]
+                px-6
+                sm:px-8
+                py-3.5
+                sm:py-4
+                text-[16px]
+                sm:text-[17px]
                 font-semibold
                 text-[#2B3648]
                 shadow-[0_8px_24px_rgba(15,23,42,0.06)]

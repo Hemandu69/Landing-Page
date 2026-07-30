@@ -75,9 +75,9 @@ const CommunityMenu = ({ isOpen, onClose, triggerRef }) => {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: -8, scale: 0.98 }}
       transition={{ duration: 0.2, ease: "easeOut" }}
-      className="absolute left-0 top-[calc(100%+12px)] z-50 w-[720px] overflow-hidden rounded-[26px] border border-gray-200/90 bg-[#F8F9FE] p-7 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+      className="absolute left-0 top-[calc(100%+12px)] z-50 max-w-[calc(100vw-32px)] sm:w-[540px] md:w-[680px] lg:w-[720px] overflow-hidden rounded-[26px] border border-gray-200/90 bg-[#F8F9FE] p-5 sm:p-7 shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
     >
-      <div className="grid grid-cols-[200px_1fr] gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] gap-4 sm:gap-6">
         {/* Left Column */}
         <div className="flex flex-col gap-6 border-r border-gray-200/80 pr-6 pt-1">
           {leftNavItems.map((item) => (

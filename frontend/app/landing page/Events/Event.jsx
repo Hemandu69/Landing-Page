@@ -117,7 +117,7 @@ const Event = () => {
 
   return (
     <div className="w-full bg-[#ECEBFA]">
-      <section className="w-full overflow-hidden rounded-b-[32px] sm:rounded-b-[40px] lg:rounded-b-[48px] bg-[#261F47] px-6 py-20">
+      <section className="w-full overflow-hidden rounded-b-[32px] sm:rounded-b-[40px] lg:rounded-b-[48px] bg-[#261F47] px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
 
       <div
         className="
@@ -129,15 +129,15 @@ const Event = () => {
 
         <div className="mt-0">
 
-          <div className="flex items-start justify-between gap-10">
+          <div className="flex items-start justify-between gap-6 sm:gap-10">
 
             <div>
 
-              <h2 className="text-[45px] font-bold leading-[60px] tracking-[-0.03em] text-white">
+              <h2 className="text-[26px] sm:text-[36px] lg:text-[45px] font-bold leading-tight lg:leading-[60px] tracking-[-0.03em] text-white">
                 Events You Shouldn't Miss
               </h2>
 
-              <p className="mt-0 max-w-[1000px] text-[15px] leading-[20px] mb-7 text-white/80">
+              <p className="mt-2 max-w-[1000px] text-[13px] sm:text-[15px] leading-[18px] sm:leading-[20px] mb-5 sm:mb-7 text-white/80">
                 From national campaigns and youth festivals to workshops,
                 webinars, discover events that bring young people together to
                 learn, connect, and contribute.
@@ -149,46 +149,46 @@ const Event = () => {
               src={ViewAllButton}
               alt="View All"
               priority
-              className="w-[50px] shrink-0"
+              className="w-[40px] sm:w-[50px] shrink-0"
             />
 
           </div>
 
           <div
-            className="mx-2.5 rounded-[24px] p-[14px] pb-[72px] transition-all duration-500"
+            className="mx-0 sm:mx-2.5 rounded-[24px] p-3 sm:p-[14px] pb-8 sm:pb-[72px] transition-all duration-500"
             style={{ backgroundColor: current.theme }}
           >
-            <div className="grid grid-cols-[1.05fr_0.95fr] gap-8 rounded-[20px] bg-[#F6F5FF] px-8 py-4 lg:px-10">
+            <div className="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-6 lg:gap-8 rounded-[20px] bg-[#F6F5FF] p-4 sm:px-8 lg:px-10 py-4">
 
-              <div className="flex h-[320px] flex-col justify-between">
+              <div className="flex h-auto lg:h-[320px] flex-col justify-between">
 
                 <div>
 
-                  <h3 className="text-[30px] font-bold leading-[30px] text-[#111827]">
+                  <h3 className="text-[22px] sm:text-[26px] lg:text-[30px] font-bold leading-tight sm:leading-[30px] text-[#111827]">
                     {current.title}
                   </h3>
 
-                  <p className="mt-3 min-h-[78px] max-w-[530px] text-[17px] leading-[25px] text-[#6B7280]">
+                  <p className="mt-2 sm:mt-3 min-h-0 lg:min-h-[78px] max-w-[530px] text-[14px] sm:text-[17px] leading-[20px] sm:leading-[25px] text-[#6B7280]">
                     {current.description}
                   </p>
 
                   <div className="mt-4 h-px w-full bg-[#D7DAE2]" />
 
-                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
+                  <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-[13px] sm:text-[16px]">
 
                     <div className="flex items-center gap-2 text-[#374151]">
                       <Calendar size={18} strokeWidth={2} />
-                      <span className="text-[16px]">{current.date}</span>
+                      <span>{current.date}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-[#374151]">
                       <Clock3 size={18} strokeWidth={2} />
-                      <span className="text-[16px]">{current.time}</span>
+                      <span>{current.time}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-[#374151]">
                       <MapPin size={18} strokeWidth={2} />
-                      <span className="text-[16px]">
+                      <span>
                         {current.location}
                       </span>
                     </div>
@@ -197,16 +197,21 @@ const Event = () => {
 
                 <button
                   className="
-                    mt-20
+                    mt-6
+                    lg:mt-20
                     inline-flex
-                    h-[48px]
+                    h-[42px]
+                    sm:h-[48px]
                     w-fit
                     items-center
-                    gap-4
+                    gap-3
+                    sm:gap-4
                     rounded-full
                     bg-[#374151]
-                    px-6
-                    text-[16px]
+                    px-5
+                    sm:px-6
+                    text-[14px]
+                    sm:text-[16px]
                     font-semibold
                     text-white
                     transition-all
@@ -235,7 +240,9 @@ const Event = () => {
                   alt={current.title}
                   priority
                   className="
-                    h-[320px]
+                    h-[200px]
+                    sm:h-[280px]
+                    lg:h-[320px]
                     w-full
                     rounded-[18px]
                     object-cover
@@ -250,7 +257,7 @@ const Event = () => {
 
           </div>
 
-          <div className="relative z-10 -mt-[38px] grid grid-cols-4 gap-4 px-0">
+          <div className="relative z-10 mt-4 lg:-mt-[38px] grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 px-0">
 
             {events.map((event, index) => {
 
@@ -261,11 +268,15 @@ const Event = () => {
                   key={event.id}
                   onClick={() => setActive(index)}
                   className="
-                    h-[116px]
+                    h-auto
+                    sm:h-[116px]
                     rounded-[18px]
-                    border-4
-                    px-5
-                    py-4
+                    border-2
+                    sm:border-4
+                    px-3
+                    sm:px-5
+                    py-3
+                    sm:py-4
                     flex
                     flex-col
                     justify-center
@@ -284,13 +295,13 @@ const Event = () => {
                   }}
                 >
                   <p
-                    className="text-[14px] uppercase"
+                    className="text-[11px] sm:text-[14px] uppercase"
                     style={{ color: isActive ? "#6B7280" : "rgba(255,255,255,0.7)" }}
                   >
                     EVENT {event.id}
                   </p>
 
-                  <p className="mt-3 whitespace-pre-line text-[18px] font-semibold leading-[28px]">
+                  <p className="mt-1 sm:mt-3 whitespace-pre-line text-[13px] sm:text-[18px] font-semibold leading-snug sm:leading-[28px] line-clamp-2">
                     {event.tabTitle}
                   </p>
 
@@ -309,8 +320,10 @@ const Event = () => {
                 left-0
                 top-1/2
                 flex
-                h-14
-                w-14
+                h-10
+                w-10
+                sm:h-14
+                sm:w-14
                 -translate-y-1/2
                 items-center
                 justify-center
@@ -325,7 +338,7 @@ const Event = () => {
               <ArrowLeft size={22} strokeWidth={2.5} />
             </button>
 
-            <div className="absolute left-1/2 top-1/2 h-[6px] w-[320px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full bg-white/20">
+            <div className="absolute left-1/2 top-1/2 h-[6px] w-[160px] sm:w-[320px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full bg-white/20">
 
               <div
                 className="h-full rounded-full bg-white transition-all duration-500"
@@ -343,8 +356,10 @@ const Event = () => {
                 right-0
                 top-1/2
                 flex
-                h-14
-                w-14
+                h-10
+                w-10
+                sm:h-14
+                sm:w-14
                 -translate-y-1/2
                 items-center
                 justify-center

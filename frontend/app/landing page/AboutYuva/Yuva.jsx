@@ -35,32 +35,38 @@ const features = [
 const Yuva = () => {
   return (
     <div className="w-full bg-[#E2E5FD]">
-      <section className="w-full overflow-hidden rounded-t-[32px] sm:rounded-t-[40px] lg:rounded-t-[48px] bg-[#261F47] px-6 py-20">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-8">
+      <section className="w-full overflow-hidden rounded-t-[32px] sm:rounded-t-[40px] lg:rounded-t-[48px] bg-[#261F47] px-4 sm:px-6 py-12 sm:py-16 lg:py-20">
+        <div className="mx-auto flex max-w-[1280px] flex-col lg:flex-row items-center justify-between gap-8">
 
         {/* ================= Left Content ================= */}
 
         <div
           className="
-            w-[770px]
+            w-full
+            lg:w-[770px]
             rounded-[25px]
             bg-[#E2E5FD]
-            px-8
-            py-11
-            h-[430px]
+            px-5
+            sm:px-8
+            py-6
+            sm:py-11
+            h-auto
+            lg:h-[430px]
           "
         >
 
 
           <h2
             className="
-              text-[40px]
+              text-[26px]
+              sm:text-[34px]
+              lg:text-[40px]
               font-bold
-              leading-[35px]
+              leading-tight
+              lg:leading-[35px]
               tracking-[-0.05em]
               text-[#111827]
               max-w-[620px]
-              font-bold
             "
           >
             About Mera Yuva Bharat
@@ -68,9 +74,11 @@ const Yuva = () => {
 
           <p
             className="
-              mt-5
+              mt-3
+              sm:mt-5
               max-w-[640px]
-              text-[14px]
+              text-[13px]
+              sm:text-[14px]
               leading-[20px]
               text-[#4B5563]
             "
@@ -83,7 +91,7 @@ const Yuva = () => {
 
           {/* ================= Feature Grid ================= */}
 
-          <div className="mt-8 grid grid-cols-2 gap-6">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-6">
 
             {features.map((item) => {
               const Icon = item.icon;
@@ -94,12 +102,16 @@ const Yuva = () => {
                   className="
                     flex
                     items-center
-                    gap-5
+                    gap-3
+                    sm:gap-5
                     rounded-[10px]
                     bg-[#1E293913]
-                    px-5
-                    py-4
-                    h-[50px]
+                    px-4
+                    sm:px-5
+                    py-3
+                    sm:py-4
+                    h-auto
+                    sm:h-[50px]
                     font-medium
                   "
                 >
@@ -112,8 +124,6 @@ const Yuva = () => {
                       shrink-0
                       items-center
                       justify-center
-                     
-                      
                     "
                   >
                     <Icon
@@ -126,7 +136,8 @@ const Yuva = () => {
                   <p
                     className="
                       text-[12px]
-                      leading-[20px]
+                      leading-[18px]
+                      sm:leading-[20px]
                       text-[#374151]
                     "
                   >
@@ -139,18 +150,18 @@ const Yuva = () => {
           </div>
                     {/* ================= CTA ================= */}
 
-          <div className="mt-2">
+          <div className="mt-4 sm:mt-2">
             <a
               href="https://mybharat.gov.in/pages/about_mybharat"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-full transition-all duration-300 hover:scale-[1.05] hover:opacity-95 active:scale-[0.98] cursor-pointer mt-10 shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_25px_rgba(102,86,217,0.25)]"
+              className="inline-block rounded-full transition-all duration-300 hover:scale-[1.05] hover:opacity-95 active:scale-[0.98] cursor-pointer mt-6 sm:mt-10 shadow-[0_4px_15px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_25px_rgba(102,86,217,0.25)]"
             >
               <Image
                 src={GetToKnowMore}
                 alt="Get To Know More"
                 priority
-                className="w-[170px] h-auto object-contain"
+                className="w-[150px] sm:w-[170px] h-auto object-contain"
               />
             </a>
           </div>
@@ -162,9 +173,14 @@ const Yuva = () => {
         <div
           className="
             relative
-            h-[520px]
-            w-[460px]
+            h-[300px]
+            sm:h-[420px]
+            lg:h-[520px]
+            w-full
+            max-w-[460px]
             shrink-0
+            mt-4
+            lg:mt-0
           "
         >
 

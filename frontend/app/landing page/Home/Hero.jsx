@@ -9,7 +9,7 @@ import { HERO_STATES } from "./heroState";
 import useHeroController from "./useHeroController";
 
 const Hero = () => {
-  const { heroState, showResults, scope, startTimeline, closeTimeline } = useHeroController();
+  const { heroState, showResults, setShowResults, scope, startTimeline, triggerSearch, closeTimeline } = useHeroController();
   const searchOpen = heroState !== HERO_STATES.DEFAULT;
 
   return (
@@ -28,8 +28,10 @@ const Hero = () => {
       <Search
         heroState={heroState}
         startTimeline={startTimeline}
+        triggerSearch={triggerSearch}
         closeTimeline={closeTimeline}
         showResults={showResults}
+        setShowResults={setShowResults}
       />
     </section>
   );

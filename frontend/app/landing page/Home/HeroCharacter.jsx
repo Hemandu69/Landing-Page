@@ -35,7 +35,7 @@ const HeroCharacters = ({ heroState }) => {
               height={600}
               priority
               draggable={false}
-              className="select-none"
+              className="select-none max-w-full h-auto px-4 sm:px-0"
             />
           </motion.div>
         )}

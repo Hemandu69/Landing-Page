@@ -213,15 +213,15 @@ const Opportunity = () => {
   const [activeTab, setActiveTab] = useState("Popular");
 
   return (
-    <section className="bg-[#261F47] py-16 text-white">
-      <div className="mx-auto max-w-[1340px] px-6 sm:px-8 lg:px-10">
+    <section className="bg-[#261F47] py-12 sm:py-16 text-white">
+      <div className="mx-auto max-w-[1340px] px-4 sm:px-8 lg:px-10">
         {/* Header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
-            <h2 className="text-[36px] font-bold leading-tight tracking-tight sm:text-[42px]">
+            <h2 className="text-[28px] sm:text-[36px] lg:text-[42px] font-bold leading-tight tracking-tight">
               Featured Opportunities
             </h2>
-            <p className="mt-2 text-[15px] font-medium text-white/80">
+            <p className="mt-2 text-[14px] sm:text-[15px] font-medium text-white/80">
               Explore handpicked internships, volunteering drives, competitions, campaigns, and events designed to help you learn, contribute, and grow.
             </p>
           </div>
@@ -230,7 +230,7 @@ const Opportunity = () => {
             href="https://mybharat.gov.in/"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 flex shrink-0 items-center gap-2 rounded-full bg-white px-6 py-2.5 text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-100 hover:scale-105 active:scale-98 cursor-pointer"
+            className="mt-2 flex shrink-0 items-center gap-2 rounded-full bg-white px-5 sm:px-6 py-2.5 text-[14px] font-bold text-[#1F2937] shadow-sm transition-all hover:bg-gray-100 hover:scale-105 active:scale-98 cursor-pointer w-fit"
           >
             <span>View All</span>
             <ArrowRight size={18} strokeWidth={2.2} />
@@ -238,7 +238,7 @@ const Opportunity = () => {
         </div>
 
         {/* Filter Tabs */}
-        <div className="mt-8 flex items-center gap-2 rounded-full bg-white p-1.5 w-fit shadow-xs">
+        <div className="mt-6 sm:mt-8 flex flex-wrap sm:flex-nowrap items-center gap-2 rounded-full bg-white p-1.5 w-full sm:w-fit shadow-xs overflow-x-auto no-scrollbar">
           {["Popular", "Recently Added", "Near You"].map((tab) => {
             const isActive = activeTab === tab;
             return (
@@ -246,7 +246,7 @@ const Opportunity = () => {
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-6 py-2 text-[14px] font-bold transition-all cursor-pointer ${
+                className={`rounded-full px-4 sm:px-6 py-2 text-[13px] sm:text-[14px] font-bold transition-all cursor-pointer whitespace-nowrap flex-1 sm:flex-initial text-center ${
                   isActive
                     ? "bg-[#6953D8] text-white shadow-sm"
                     : "text-[#6953D8] hover:bg-gray-100"
