@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Default font for the entire app */
+  --font-sans: var(--font-hanken);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Hanken Grotesk", sans-serif !important;
+}
+/* Hide scrollbar but keep scrolling */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
