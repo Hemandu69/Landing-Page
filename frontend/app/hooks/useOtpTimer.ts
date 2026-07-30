@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-export function useOtpTimer(initialSeconds: number = 60) {
+export function useOtpTimer(initialSeconds: number = 120) {
   const [secondsLeft, setSecondsLeft] = useState(initialSeconds);
   const [canResend, setCanResend] = useState(false);
 
@@ -20,8 +20,8 @@ export function useOtpTimer(initialSeconds: number = 60) {
     return () => clearInterval(interval);
   }, [secondsLeft]);
 
-  const resetTimer = useCallback(() => {
-    setSecondsLeft(initialSeconds);
+  const resetTimer = useCallback((newSeconds?: number) => {
+    setSecondsLeft(newSeconds !== undefined ? newSeconds : initialSeconds);
     setCanResend(false);
   }, [initialSeconds]);
 

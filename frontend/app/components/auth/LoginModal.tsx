@@ -7,7 +7,8 @@ import { ArrowLeft, ArrowRight, Pencil } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useDetectLoginType } from "../../hooks/useDetectLoginType";
 import { useOtpTimer } from "../../hooks/useOtpTimer";
-import { mockAuthService } from "../../services/auth/mockAuthService";
+import { authService } from "../../services/auth/authService";
+import { OTPType, OTPPurpose } from "../../types/auth";
 
 import { AuthInput } from "./AuthInput";
 import { OtpInput } from "./OtpInput";
@@ -21,7 +22,7 @@ type Step = "INPUT" | "OTP" | "ONBOARDING";
 
 export const LoginModal: React.FC = () => {
   const router = useRouter();
-  const { isLoginModalOpen, closeLoginModal, setAuthenticatedUser, authMode, setAuthMode } = useAuth();
+  const { isLoginModalOpen, closeLoginModal, loginWithTokens, authMode, setAuthMode } = useAuth();
 
   const [step, setStep] = useState<Step>("INPUT");
   const [inputValue, setInputValue] = useState("");
@@ -30,6 +31,7 @@ export const LoginModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [debugOtp, setDebugOtp] = useState<string | null>(null);
 
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -38,7 +40,7 @@ export const LoginModal: React.FC = () => {
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const { type: detectedType, isValid, error: inputError, cleanedValue } = useDetectLoginType(inputValue);
-  const { formattedTime, canResend, resetTimer } = useOtpTimer(60);
+  const { formattedTime, canResend, resetTimer } = useOtpTimer(120);
 
   useEffect(() => {
     if (isLoginModalOpen) {
@@ -47,6 +49,7 @@ export const LoginModal: React.FC = () => {
       setInputValue("");
       setOtpValue("");
       setOtpError(null);
+      setDebugOtp(null);
     } else if (previousFocusRef.current) {
       previousFocusRef.current.focus();
     }
@@ -94,16 +97,24 @@ export const LoginModal: React.FC = () => {
 
     setIsLoading(true);
     setOtpError(null);
+    setDebugOtp(null);
 
     try {
-      const res = await mockAuthService.sendOtp(cleanedValue);
+      const otpType: OTPType = detectedType === "email" ? "EMAIL" : "PHONE";
+      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+
+      const res = await authService.requestOTP(cleanedValue, otpType, purpose);
+
       if (res.success) {
         setStep("OTP");
-        resetTimer();
+        resetTimer(res.expires_in || 120);
+        if (res.debug_otp) {
+          setDebugOtp(res.debug_otp);
+        }
         showToast("success", res.message);
       }
     } catch (err: any) {
-      showToast("error", err.message || "Failed to send OTP. Please try again.");
+      showToast("error", err.message || "Failed to send OTP. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -116,13 +127,20 @@ export const LoginModal: React.FC = () => {
     setOtpError(null);
 
     try {
-      const res = await mockAuthService.resendOtp(cleanedValue);
+      const otpType: OTPType = detectedType === "email" ? "EMAIL" : "PHONE";
+      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+
+      const res = await authService.requestOTP(cleanedValue, otpType, purpose);
+
       if (res.success) {
-        resetTimer();
+        resetTimer(res.expires_in || 120);
+        if (res.debug_otp) {
+          setDebugOtp(res.debug_otp);
+        }
         showToast("success", res.message);
       }
     } catch (err: any) {
-      showToast("error", "Failed to resend OTP.");
+      showToast("error", err.message || "Failed to resend OTP.");
     } finally {
       setIsResending(false);
     }
@@ -136,45 +154,36 @@ export const LoginModal: React.FC = () => {
     setOtpError(null);
 
     try {
-      const res = await mockAuthService.verifyOtp(cleanedValue, otpValue);
-      if (res.success && res.user) {
+      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+      const res = await authService.verifyOTP(cleanedValue, otpValue, purpose);
+
+      if (res.success && res.access_token && res.refresh_token && res.user) {
+        loginWithTokens(res.user, res.access_token, res.refresh_token);
+
         if (authMode === "register") {
           setStep("ONBOARDING");
-          showToast("success", "OTP verified! Please complete your profile.");
+          showToast("success", "OTP verified! Complete your profile.");
         } else {
-          setAuthenticatedUser(res.user);
-          showToast("success", res.message);
+          showToast("success", "Authentication successful! Welcome to MY Bharat.");
           setTimeout(() => {
             closeLoginModal();
             router.push("/dashboard");
           }, 400);
         }
       } else {
-        setOtpError(res.message);
-        showToast("error", res.message);
+        setOtpError("Invalid OTP code. Please try again.");
+        showToast("error", "Verification failed.");
       }
     } catch (err: any) {
-      setOtpError("An unexpected error occurred during verification.");
-      showToast("error", "Verification failed.");
+      const msg = err.message || "Invalid or expired OTP code.";
+      setOtpError(msg);
+      showToast("error", msg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleOnboardingComplete = (userData: {
-    firstName: string;
-    lastName: string;
-    role: string;
-    interests: string[];
-  }) => {
-    const newUser = {
-      id: "user_" + Date.now(),
-      identifier: cleanedValue,
-      type: detectedType,
-      name: `${userData.firstName} ${userData.lastName}`,
-      createdAt: new Date().toISOString(),
-    };
-    setAuthenticatedUser(newUser);
+  const handleOnboardingComplete = () => {
     showToast("success", "Registration completed successfully!");
     setTimeout(() => {
       closeLoginModal();
@@ -202,7 +211,7 @@ export const LoginModal: React.FC = () => {
             className="fixed inset-0 bg-[#0F172A]/40 backdrop-blur-xs"
           />
 
-          {/* Floating Navigation Pill Button (Top Left outside modal card) */}
+          {/* Floating Navigation Pill Button */}
           <div id="floating-nav-button" className="absolute top-4 left-4 sm:top-10 sm:left-10 z-20">
             {step === "INPUT" ? (
               <button
@@ -233,7 +242,7 @@ export const LoginModal: React.FC = () => {
             )}
           </div>
 
-          {/* Modal Card matching Figma */}
+          {/* Modal Card matching Figma Design System */}
           <motion.div
             ref={modalRef}
             role="dialog"
@@ -401,6 +410,14 @@ export const LoginModal: React.FC = () => {
                     hasError={!!otpError}
                   />
 
+                  {debugOtp && (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-center">
+                      <p className="text-[12px] font-semibold text-amber-800">
+                        Development OTP Code: <span className="font-bold tracking-widest text-amber-900">{debugOtp}</span>
+                      </p>
+                    </div>
+                  )}
+
                   <Countdown
                     formattedTime={formattedTime}
                     canResend={canResend}
@@ -426,7 +443,7 @@ export const LoginModal: React.FC = () => {
               </motion.div>
             )}
 
-            {/* Step 3: Registration Onboarding Flow (Triggered after OTP in Register mode) */}
+            {/* Step 3: Registration Onboarding Flow */}
             {step === "ONBOARDING" && (
               <motion.div
                 key="step-onboarding"

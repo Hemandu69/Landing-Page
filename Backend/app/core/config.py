@@ -1,8 +1,13 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Determine absolute path to backend root directory and .env file
+BACKEND_DIR = Path(__file__).resolve().parent.parent.parent
+ENV_FILE_PATH = BACKEND_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    """Application configuration settings loaded from environment variables."""
+    """Application configuration settings loaded from environment variables in .env."""
 
     APP_NAME: str = "MY Bharat API"
     APP_VERSION: str = "1.0.0"
@@ -13,12 +18,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "super-secret-key-change-in-production-1234567890!"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    OTP_EXPIRY_SECONDS: int = 300
+    OTP_EXPIRY_SECONDS: int = 120
 
     FRONTEND_URL: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(ENV_FILE_PATH),
         env_file_encoding="utf-8",
         extra="ignore",
         case_sensitive=True,

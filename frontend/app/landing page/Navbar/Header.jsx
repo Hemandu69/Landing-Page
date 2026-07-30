@@ -359,7 +359,7 @@ const Header = () => {
                   >
                     <Image
                       src={avatarsIcon}
-                      alt={user?.name || "User Avatar"}
+                      alt={user?.first_name || user?.email || user?.phone || "User Avatar"}
                       width={40}
                       height={40}
                       className="h-10 w-10 object-contain rounded-full border border-[#6355DC]/30 shadow-2xs"
@@ -386,10 +386,12 @@ const Header = () => {
                           />
                           <div className="flex flex-col min-w-0">
                             <span className="text-[13px] font-bold text-[#111827] truncate">
-                              {user?.name || "Karan Singh"}
+                              {user?.first_name
+                                ? `${user.first_name} ${user.last_name || ""}`.trim()
+                                : user?.email || user?.phone || "Registered Youth"}
                             </span>
                             <span className="text-[11px] font-medium text-[#6B7280] truncate">
-                              {user?.identifier || "Registered Youth"}
+                              {user?.email || user?.phone || "Verified Session"}
                             </span>
                           </div>
                         </div>

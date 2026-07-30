@@ -1,104 +1,142 @@
 "use client";
 
-import React, { useState } from "react";
-import { ChevronDown, Loader2 } from "lucide-react";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronDown, Loader2, Save } from "lucide-react";
+import { useProfile, useUpdateProfile } from "../../hooks/useProfile";
+import { profileSchema, ProfileFormValues } from "../../schemas/profileSchema";
 import { ProfilePhotoUpload } from "./ProfilePhotoUpload";
 import { ProfileToggle } from "./ProfileToggle";
+import { ProfileSkeleton } from "./ProfileSkeleton";
 import { Toast, ToastMessage } from "../auth/Toast";
 
 export const ProfileForm: React.FC = () => {
-  // Form State initialized to empty strings for clean placeholders
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    referralCode: "",
-    dobDay: "",
-    dobMonth: "",
-    dobYear: "",
-    gender: "",
-    casteCategory: "",
-    pwd: "No",
-    country: "India",
-    addressLine1: "",
-    addressLine2: "",
-    consentTerms: false,
-    consentNcs: false,
-    publicProfile: true,
+  const { data: profile, isLoading: isFetchingProfile, isError, error } = useProfile();
+  const updateProfileMutation = useUpdateProfile();
+  const [toast, setToast] = React.useState<ToastMessage | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      dobDay: "",
+      dobMonth: "",
+      dobYear: "",
+      gender: "",
+      country: "India",
+      address_line_1: "",
+      address_line_2: "",
+      bio: "",
+      public_profile: true,
+    },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [toast, setToast] = useState<ToastMessage | null>(null);
+  const publicProfileValue = watch("public_profile");
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    if (type === "checkbox") {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+  // Populate form values when user profile data is loaded from GET /api/users/me
+  useEffect(() => {
+    if (profile) {
+      let day = "";
+      let month = "";
+      let year = "";
+      if (profile.date_of_birth) {
+        const parts = profile.date_of_birth.split("-");
+        if (parts.length === 3) {
+          year = parts[0];
+          month = parts[1];
+          day = parts[2];
+        }
+      }
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors: { [key: string]: string } = {};
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "First Name is required.";
-    }
-    if (!formData.dobDay || !formData.dobMonth || !formData.dobYear) {
-      newErrors.dob = "Complete Date of Birth is required.";
-    }
-    if (!formData.gender) {
-      newErrors.gender = "Gender is required.";
-    }
-    if (!formData.casteCategory) {
-      newErrors.casteCategory = "Caste Category is required.";
-    }
-    if (!formData.addressLine1.trim()) {
-      newErrors.addressLine1 = "Address Line 1 is required.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      setToast({
-        id: String(Date.now()),
-        type: "error",
-        message: "Please fill in all required fields.",
+      reset({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        dobDay: day,
+        dobMonth: month,
+        dobYear: year,
+        gender: profile.gender || "",
+        country: profile.country || "India",
+        address_line_1: profile.address_line_1 || "",
+        address_line_2: profile.address_line_2 || "",
+        bio: profile.bio || "",
+        public_profile: profile.public_profile ?? true,
       });
-      return;
     }
+  }, [profile, reset]);
 
-    setIsLoading(true);
+  const onSubmit = async (values: ProfileFormValues) => {
+    try {
+      let date_of_birth: string | null = null;
+      if (values.dobYear && values.dobMonth && values.dobDay) {
+        const y = values.dobYear.padStart(4, "20");
+        const m = values.dobMonth.padStart(2, "0");
+        const d = values.dobDay.padStart(2, "0");
+        date_of_birth = `${y}-${m}-${d}`;
+      }
 
-    // Mock API Save request with delay
-    setTimeout(() => {
-      setIsLoading(false);
+      const payload = {
+        first_name: values.first_name.trim(),
+        last_name: values.last_name ? values.last_name.trim() : null,
+        date_of_birth,
+        gender: values.gender || null,
+        country: values.country || "India",
+        address_line_1: values.address_line_1 ? values.address_line_1.trim() : null,
+        address_line_2: values.address_line_2 ? values.address_line_2.trim() : null,
+        bio: values.bio ? values.bio.trim() : null,
+        public_profile: values.public_profile,
+      };
+
+      await updateProfileMutation.mutateAsync(payload);
+
       setToast({
         id: String(Date.now()),
         type: "success",
-        message: "Profile updated successfully!",
+        message: "Profile information saved successfully!",
       });
-    }, 1000);
+    } catch (err: any) {
+      setToast({
+        id: String(Date.now()),
+        type: "error",
+        message: err.message || "Failed to update profile details.",
+      });
+    }
   };
+
+  if (isFetchingProfile) {
+    return <ProfileSkeleton />;
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6 rounded-2xl bg-red-50 border border-red-200 text-center flex flex-col items-center gap-3">
+        <p className="text-[14px] font-bold text-red-700">
+          {(error as Error)?.message || "Failed to load user profile."}
+        </p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 rounded-full bg-red-600 text-white font-bold text-[13px]"
+        >
+          Retry Loading
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
         {/* Profile Photo Upload Section */}
         <ProfilePhotoUpload />
 
@@ -113,16 +151,17 @@ export const ProfileForm: React.FC = () => {
             </label>
             <input
               type="text"
-              name="firstName"
               placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              required
-              className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
+              {...register("first_name")}
+              className={`w-full rounded-[14px] border bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:outline-none focus:ring-2 transition-all shadow-2xs ${
+                errors.first_name
+                  ? "border-[#EF4444] focus:ring-[#EF4444]/20"
+                  : "border-gray-200 focus:border-[#6355DC] focus:ring-[#6355DC]/20"
+              }`}
             />
-            {errors.firstName && (
+            {errors.first_name && (
               <span className="text-[12px] font-medium text-[#EF4444]">
-                {errors.firstName}
+                {errors.first_name.message}
               </span>
             )}
           </div>
@@ -134,116 +173,57 @@ export const ProfileForm: React.FC = () => {
             </label>
             <input
               type="text"
-              name="lastName"
               placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleInputChange}
+              {...register("last_name")}
               className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
             />
           </div>
 
-          {/* Referral Code */}
+          {/* Date of Birth (Day, Month, Year) */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-[#374151]">
-              Referral Code
-            </label>
-            <input
-              type="text"
-              name="referralCode"
-              placeholder="Referral Code"
-              value={formData.referralCode}
-              onChange={handleInputChange}
-              className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
-            />
-          </div>
-
-          {/* Date of Birth (3 inputs: Day, Month, Year) */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-bold text-[#374151]">
-              Date of Birth <span className="text-[#EF4444]">*</span>
+              Date of Birth
             </label>
             <div className="grid grid-cols-3 gap-2.5">
               <input
                 type="text"
-                name="dobDay"
                 placeholder="dd"
                 maxLength={2}
-                value={formData.dobDay}
-                onChange={handleInputChange}
+                {...register("dobDay")}
                 className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 text-center focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
               />
               <input
                 type="text"
-                name="dobMonth"
                 placeholder="mm"
                 maxLength={2}
-                value={formData.dobMonth}
-                onChange={handleInputChange}
+                {...register("dobMonth")}
                 className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 text-center focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
               />
               <input
                 type="text"
-                name="dobYear"
                 placeholder="yyyy"
                 maxLength={4}
-                value={formData.dobYear}
-                onChange={handleInputChange}
+                {...register("dobYear")}
                 className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 text-center focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
               />
             </div>
-            {errors.dob && (
-              <span className="text-[12px] font-medium text-[#EF4444]">
-                {errors.dob}
-              </span>
-            )}
           </div>
 
           {/* Gender */}
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] font-bold text-[#374151]">
-              Gender <span className="text-[#EF4444]">*</span>
+              Gender
             </label>
             <div className="relative">
               <select
-                name="gender"
-                value={formData.gender}
-                onChange={handleInputChange}
-                className={`w-full appearance-none rounded-[14px] border border-gray-200 bg-white px-4 py-3 pr-10 text-[14px] font-medium focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs cursor-pointer ${
-                  formData.gender ? "text-[#111827]" : "text-gray-400/60"
-                }`}
+                {...register("gender")}
+                className="w-full appearance-none rounded-[14px] border border-gray-200 bg-white px-4 py-3 pr-10 text-[14px] font-medium text-[#111827] focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs cursor-pointer"
               >
-                <option value="" disabled hidden>Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-              </select>
-              <ChevronDown
-                size={18}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-              />
-            </div>
-          </div>
-
-          {/* Caste Category */}
-          <div className="flex flex-col gap-1.5">
-            <label className="text-[13px] font-bold text-[#374151]">
-              Caste Category <span className="text-[#EF4444]">*</span>
-            </label>
-            <div className="relative">
-              <select
-                name="casteCategory"
-                value={formData.casteCategory}
-                onChange={handleInputChange}
-                className={`w-full appearance-none rounded-[14px] border border-gray-200 bg-white px-4 py-3 pr-10 text-[14px] font-medium focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs cursor-pointer ${
-                  formData.casteCategory ? "text-[#111827]" : "text-gray-400/60"
-                }`}
-              >
-                <option value="" disabled hidden>Select Caste Category</option>
-                <option value="General">General</option>
-                <option value="OBC">OBC</option>
-                <option value="SC">SC</option>
-                <option value="ST">ST</option>
-                <option value="Other">Other</option>
+                <option value="">Select Gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+                <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
               </select>
               <ChevronDown
                 size={18}
@@ -253,48 +233,32 @@ export const ProfileForm: React.FC = () => {
           </div>
         </div>
 
-        {/* PwD (Disability) */}
-        <div className="flex flex-col gap-2 mt-1">
+        {/* Bio */}
+        <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-bold text-[#374151]">
-            PwD (Disability) <span className="text-[#EF4444]">*</span>
+            Bio (Max 500 characters)
           </label>
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 text-[14px] font-medium text-[#111827] cursor-pointer">
-              <input
-                type="radio"
-                name="pwd"
-                value="Yes"
-                checked={formData.pwd === "Yes"}
-                onChange={handleInputChange}
-                className="h-4 w-4 accent-[#6355DC] cursor-pointer"
-              />
-              <span>Yes</span>
-            </label>
-
-            <label className="flex items-center gap-2 text-[14px] font-medium text-[#111827] cursor-pointer">
-              <input
-                type="radio"
-                name="pwd"
-                value="No"
-                checked={formData.pwd === "No"}
-                onChange={handleInputChange}
-                className="h-4 w-4 accent-[#6355DC] cursor-pointer"
-              />
-              <span>No</span>
-            </label>
-          </div>
+          <textarea
+            rows={3}
+            placeholder="Tell us a little bit about yourself..."
+            {...register("bio")}
+            className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs resize-none"
+          />
+          {errors.bio && (
+            <span className="text-[12px] font-medium text-[#EF4444]">
+              {errors.bio.message}
+            </span>
+          )}
         </div>
 
         {/* Country */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-bold text-[#374151]">
-            Country <span className="text-[#EF4444]">*</span>
+            Country
           </label>
           <div className="relative">
             <select
-              name="country"
-              value={formData.country}
-              onChange={handleInputChange}
+              {...register("country")}
               className="w-full appearance-none rounded-[14px] border border-gray-200 bg-white px-4 py-3 pr-10 text-[14px] font-medium text-[#111827] focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs cursor-pointer"
             >
               <option value="India">India</option>
@@ -309,91 +273,50 @@ export const ProfileForm: React.FC = () => {
         {/* Address Line 1 */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-bold text-[#374151]">
-            Address Line 1 <span className="text-[#EF4444]">*</span>
+            Address Line 1
           </label>
           <input
             type="text"
-            name="addressLine1"
             placeholder="Address Line 1"
-            value={formData.addressLine1}
-            onChange={handleInputChange}
-            required
+            {...register("address_line_1")}
             className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
           />
-          {errors.addressLine1 && (
-            <span className="text-[12px] font-medium text-[#EF4444]">
-              {errors.addressLine1}
-            </span>
-          )}
         </div>
 
         {/* Address Line 2 */}
         <div className="flex flex-col gap-1.5">
           <label className="text-[13px] font-bold text-[#374151]">
-            Address Line 2 (Landmark)
+            Address Line 2 (Landmark / Location)
           </label>
           <input
             type="text"
-            name="addressLine2"
-            placeholder="Address Line 2 (Landmark)"
-            value={formData.addressLine2}
-            onChange={handleInputChange}
+            placeholder="Address Line 2"
+            {...register("address_line_2")}
             className="w-full rounded-[14px] border border-gray-200 bg-white px-4 py-3 text-[14px] font-medium text-[#111827] placeholder-gray-400/60 focus:border-[#6355DC] focus:outline-none focus:ring-2 focus:ring-[#6355DC]/20 transition-all shadow-2xs"
           />
         </div>
 
-        {/* Consent Checkboxes */}
-        <div className="flex flex-col gap-3 mt-2">
-          <label className="flex items-center gap-2.5 text-[13px] font-medium text-[#4B5563] cursor-pointer">
-            <input
-              type="checkbox"
-              name="consentTerms"
-              checked={formData.consentTerms}
-              onChange={handleInputChange}
-              className="h-4 w-4 rounded border-gray-300 accent-[#6355DC] cursor-pointer"
-            />
-            <span>
-              I consent to terms of use{" "}
-              <a
-                href="https://mybharat.gov.in/pages/terms_of_use"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#EF4444] underline font-semibold hover:text-[#DC2626]"
-              >
-                * terms of use
-              </a>
-            </span>
-          </label>
-
-          <label className="flex items-center gap-2.5 text-[13px] font-medium text-[#4B5563] cursor-pointer">
-            <input
-              type="checkbox"
-              name="consentNcs"
-              checked={formData.consentNcs}
-              onChange={handleInputChange}
-              className="h-4 w-4 rounded border-gray-300 accent-[#6355DC] cursor-pointer"
-            />
-            <span>I consent to provide my data to NCS</span>
-          </label>
-        </div>
-
         <div className="h-px w-full bg-gray-200/80 my-2" />
 
-        {/* Your Public Profile Toggle */}
+        {/* Public Profile Toggle */}
         <ProfileToggle
-          enabled={formData.publicProfile}
-          onChange={(val) => setFormData((prev) => ({ ...prev, publicProfile: val }))}
+          enabled={publicProfileValue}
+          onChange={(val) => setValue("public_profile", val)}
         />
 
         {/* Save Button (Bottom Right) */}
         <div className="mt-4 flex justify-end">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={updateProfileMutation.isPending}
             className="flex items-center gap-2 rounded-full bg-[#6355DC] px-9 py-3 text-[15px] font-bold text-white shadow-md transition-all hover:bg-[#5243C9] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
           >
-            {isLoading && <Loader2 size={18} className="animate-spin" />}
-            <span>{isLoading ? "Saving..." : "Save"}</span>
+            {updateProfileMutation.isPending ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <Save size={18} />
+            )}
+            <span>{updateProfileMutation.isPending ? "Saving..." : "Save Changes"}</span>
           </button>
         </div>
       </form>

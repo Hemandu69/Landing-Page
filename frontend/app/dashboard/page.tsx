@@ -1,5 +1,6 @@
 import Header from "../landing page/Navbar/Header";
 import { DashboardLayout } from "../components/dashboard/DashboardLayout";
+import { ProtectedRoute } from "../components/auth/ProtectedRoute";
 
 export const metadata = {
   title: "Dashboard | MY Bharat",
@@ -8,9 +9,11 @@ export const metadata = {
 
 export default function DashboardPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F3F5FC]">
-      <Header />
-      <DashboardLayout />
-    </div>
+    <ProtectedRoute>
+      <div className="min-h-screen flex flex-col bg-[#F3F5FC]">
+        <Header />
+        <DashboardLayout />
+      </div>
+    </ProtectedRoute>
   );
 }

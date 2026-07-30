@@ -1,4 +1,4 @@
-﻿[build-system]
+[build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
@@ -7,4 +7,3 @@ name = "backend"
 version = "0.1.0"
 description = "FastAPI backend application"
 requires-python = ">=3.11"
-
