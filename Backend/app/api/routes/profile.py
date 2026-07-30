@@ -1,0 +1,3 @@
+﻿# Profile routes placeholder
+pass
+

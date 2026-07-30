@@ -1,0 +1,3 @@
+﻿# Profile schema placeholder
+pass
+

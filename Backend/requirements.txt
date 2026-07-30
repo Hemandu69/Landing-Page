@@ -1,0 +1,9 @@
+﻿fastapi
+uvicorn
+sqlalchemy
+alembic
+pydantic
+pymysql
+python-jose
+passlib
+

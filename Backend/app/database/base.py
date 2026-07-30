@@ -1,0 +1,3 @@
+﻿# Base database placeholder
+pass
+

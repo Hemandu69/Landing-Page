@@ -1,0 +1,3 @@
+﻿# Health routes placeholder
+pass
+

@@ -1,0 +1,3 @@
+﻿# SMS service placeholder
+pass
+

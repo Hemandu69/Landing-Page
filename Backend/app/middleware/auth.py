@@ -1,0 +1,3 @@
+﻿# Auth middleware placeholder
+pass
+

@@ -1,0 +1,3 @@
+﻿# Auth service placeholder
+pass
+
