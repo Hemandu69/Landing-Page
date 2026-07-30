@@ -52,7 +52,7 @@ The project strictly follows a **Clean Layered Architecture** ensuring complete 
                                             ▼
                   ┌──────────────────────────────────────────────────┐
                   │                  MySQL 8 Database                │
-                  └──────────────────────────────────────────────────┘
+                  └─────────────────────────┬────────────────────────┘
 ```
 
 ---
@@ -112,7 +112,7 @@ landing-page/
 │   │   │   └── user_service.py     # User Management & Avatar Processing
 │   │   └── utils/
 │   │       └── validators.py       # Phone & Email Regex Validators
-│   ├── .env                        # Local Environment Variable Configuration
+│   ├── .env.example                # Example Backend Environment Template
 │   ├── alembic.ini                 # Alembic Migration Engine Config
 │   ├── pyproject.toml              # Build System Config (UTF-8 without BOM)
 │   ├── requirements.txt            # Python Dependencies Specification
@@ -160,6 +160,7 @@ landing-page/
     │   ├── layout.tsx              # Root Layout
     │   ├── page.tsx                # Home Landing Page
     │   └── providers.tsx           # QueryClientProvider & AuthProvider
+    ├── .env.example                # Example Frontend Environment Template
     ├── package.json                # Node.js Dependencies & Scripts
     └── tsconfig.json               # TypeScript Compiler Configuration
 ```
@@ -224,10 +225,12 @@ landing-page/
 
 ---
 
-## ⚙️ Environment Configuration (`.env`)
+## ⚙️ Environment Configuration Templates (`.env.example`)
 
-### Backend Environment File (`backend/.env`)
-Create or edit `backend/.env`:
+Copy the example configuration templates to create your private `.env` files.
+
+### Backend Environment Template (`backend/.env.example`)
+Create `backend/.env` from `backend/.env.example`:
 
 ```env
 APP_NAME="MY Bharat API"
@@ -236,19 +239,19 @@ DEBUG=True
 FRONTEND_URL=http://localhost:3000
 
 # MySQL Database Connection String (RFC-compliant URL encoding)
-DATABASE_URL=mysql+pymysql://root:Hemendu%402005@127.0.0.1:3306/landing_page
+DATABASE_URL=mysql+pymysql://user:password@localhost:3306/dbname
 
 # JWT Authentication Configuration
-SECRET_KEY=p0vicyumcJmXieyQTnPea9v_9pxfSS7MYXm1h1Ts7SQ
+SECRET_KEY=change-this-secret-key-in-production
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 OTP_EXPIRY_SECONDS=120
 ```
 
-> 💡 **Important**: If your MySQL password contains special characters like `@`, URL-encode them (e.g. `%40` for `@`) in `DATABASE_URL`.
+> 💡 **Security Tip**: Never commit your actual `backend/.env` file to git. If your MySQL password contains special characters like `@`, URL-encode them (e.g. `%40` for `@`) in `DATABASE_URL`.
 
-### Frontend Environment File (`frontend/.env.local`)
-Create `frontend/.env.local`:
+### Frontend Environment Template (`frontend/.env.example`)
+Create `frontend/.env.local` from `frontend/.env.example`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
@@ -281,7 +284,12 @@ CREATE DATABASE IF NOT EXISTS landing_page CHARACTER SET utf8mb4 COLLATE utf8mb4
    cd backend
    ```
 
-2. (Optional) Create and activate a Python virtual environment:
+2. Copy the `.env.example` template to `.env` and fill in your private credentials:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. (Optional) Create and activate a Python virtual environment:
    ```bash
    python -m venv venv
    # On Windows PowerShell:
@@ -290,17 +298,17 @@ CREATE DATABASE IF NOT EXISTS landing_page CHARACTER SET utf8mb4 COLLATE utf8mb4
    source venv/bin/activate
    ```
 
-3. Install required Python packages:
+4. Install required Python packages:
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Run Alembic database migrations:
+5. Run Alembic database migrations:
    ```bash
    python -m alembic upgrade head
    ```
 
-5. Start the FastAPI development server:
+6. Start the FastAPI development server:
    ```bash
    uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
    ```
@@ -314,17 +322,22 @@ CREATE DATABASE IF NOT EXISTS landing_page CHARACTER SET utf8mb4 COLLATE utf8mb4
    cd frontend
    ```
 
-2. Install Node.js dependencies:
+2. Copy the `.env.example` template to `.env.local`:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+3. Install Node.js dependencies:
    ```bash
    npm install
    ```
 
-3. Start the Next.js development server:
+4. Start the Next.js development server:
    ```bash
    npm run dev
    ```
 
-4. Open your browser and navigate to `http://localhost:3000`.
+5. Open your browser and navigate to `http://localhost:3000`.
 
 ---
 
