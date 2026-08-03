@@ -25,11 +25,14 @@ class AuthService {
       });
       return response.data;
     } catch (error: any) {
-      const message =
+const message =
         error.response?.data?.detail ||
         error.response?.data?.message ||
+        error.response?.data?.error?.message ||
         "Failed to send OTP. Please check your details and try again.";
-      throw new Error(message);
+      const apiError = new Error(message) as Error & { status?: number };
+      apiError.status = error.response?.status || 0;
+      throw apiError;
     }
   }
 

@@ -22,7 +22,13 @@ type Step = "INPUT" | "OTP" | "ONBOARDING";
 
 export const LoginModal: React.FC = () => {
   const router = useRouter();
-  const { isLoginModalOpen, closeLoginModal, loginWithTokens, authMode, setAuthMode } = useAuth();
+  const {
+    isLoginModalOpen,
+    closeLoginModal,
+    loginWithTokens,
+    authMode,
+    setAuthMode,
+  } = useAuth();
 
   const [step, setStep] = useState<Step>("INPUT");
   const [inputValue, setInputValue] = useState("");
@@ -31,6 +37,7 @@ export const LoginModal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [otpError, setOtpError] = useState<string | null>(null);
+  const [backendError, setBackendError] = useState<string | null>(null);
   const [debugOtp, setDebugOtp] = useState<string | null>(null);
 
   const [toast, setToast] = useState<ToastMessage | null>(null);
@@ -39,7 +46,12 @@ export const LoginModal: React.FC = () => {
   const regStepsRef = useRef<RegistrationStepsRef>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  const { type: detectedType, isValid, error: inputError, cleanedValue } = useDetectLoginType(inputValue);
+  const {
+    type: detectedType,
+    isValid,
+    error: inputError,
+    cleanedValue,
+  } = useDetectLoginType(inputValue);
   const { formattedTime, canResend, resetTimer } = useOtpTimer(120);
 
   useEffect(() => {
@@ -49,6 +61,7 @@ export const LoginModal: React.FC = () => {
       setInputValue("");
       setOtpValue("");
       setOtpError(null);
+      setBackendError(null);
       setDebugOtp(null);
     } else if (previousFocusRef.current) {
       previousFocusRef.current.focus();
@@ -97,15 +110,18 @@ export const LoginModal: React.FC = () => {
 
     setIsLoading(true);
     setOtpError(null);
+    setBackendError(null);
     setDebugOtp(null);
 
     try {
       const otpType: OTPType = detectedType === "email" ? "EMAIL" : "PHONE";
-      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+      const purpose: OTPPurpose =
+        authMode === "register" ? "REGISTER" : "LOGIN";
 
       const res = await authService.requestOTP(cleanedValue, otpType, purpose);
 
       if (res.success) {
+        setBackendError(null);
         setStep("OTP");
         resetTimer(res.expires_in || 120);
         if (res.debug_otp) {
@@ -114,7 +130,14 @@ export const LoginModal: React.FC = () => {
         showToast("success", res.message);
       }
     } catch (err: any) {
-      showToast("error", err.message || "Failed to send OTP. Please check your connection and try again.");
+      if (err.status === 400) {
+        setBackendError(err.message || "Invalid email format.");
+      } else {
+        showToast(
+          "error",
+          err.message || "Unable to connect to server. Please try again.",
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +151,8 @@ export const LoginModal: React.FC = () => {
 
     try {
       const otpType: OTPType = detectedType === "email" ? "EMAIL" : "PHONE";
-      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+      const purpose: OTPPurpose =
+        authMode === "register" ? "REGISTER" : "LOGIN";
 
       const res = await authService.requestOTP(cleanedValue, otpType, purpose);
 
@@ -154,7 +178,8 @@ export const LoginModal: React.FC = () => {
     setOtpError(null);
 
     try {
-      const purpose: OTPPurpose = authMode === "register" ? "REGISTER" : "LOGIN";
+      const purpose: OTPPurpose =
+        authMode === "register" ? "REGISTER" : "LOGIN";
       const res = await authService.verifyOTP(cleanedValue, otpValue, purpose);
 
       if (res.success && res.access_token && res.refresh_token && res.user) {
@@ -164,7 +189,10 @@ export const LoginModal: React.FC = () => {
           setStep("ONBOARDING");
           showToast("success", "OTP verified! Complete your profile.");
         } else {
-          showToast("success", "Authentication successful! Welcome to MY Bharat.");
+          showToast(
+            "success",
+            "Authentication successful! Welcome to MY Bharat.",
+          );
           setTimeout(() => {
             closeLoginModal();
             router.push("/dashboard");
@@ -212,7 +240,10 @@ export const LoginModal: React.FC = () => {
           />
 
           {/* Floating Navigation Pill Button */}
-          <div id="floating-nav-button" className="absolute top-4 left-4 sm:top-10 sm:left-10 z-20">
+          <div
+            id="floating-nav-button"
+            className="absolute top-4 left-4 sm:top-10 sm:left-10 z-20"
+          >
             {step === "INPUT" ? (
               <button
                 type="button"
@@ -253,7 +284,9 @@ export const LoginModal: React.FC = () => {
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             className={`relative z-10 w-full overflow-hidden rounded-[28px] sm:rounded-[32px] border border-gray-100/80 bg-[#F3F5FC] p-5 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.25)] transition-all duration-300 ${
-              step === "ONBOARDING" ? "max-w-[560px]" : "max-w-[calc(100vw-32px)] sm:max-w-[450px]"
+              step === "ONBOARDING"
+                ? "max-w-[560px]"
+                : "max-w-[calc(100vw-32px)] sm:max-w-[450px]"
             }`}
           >
             {/* Step 1: Identifier Input */}
@@ -261,9 +294,17 @@ export const LoginModal: React.FC = () => {
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={`step-input-${authMode}`}
-                  initial={{ opacity: 0, x: authMode === "login" ? -32 : 32, scale: 0.96 }}
+                  initial={{
+                    opacity: 0,
+                    x: authMode === "login" ? -32 : 32,
+                    scale: 0.96,
+                  }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: authMode === "login" ? 32 : -32, scale: 0.96 }}
+                  exit={{
+                    opacity: 0,
+                    x: authMode === "login" ? 32 : -32,
+                    scale: 0.96,
+                  }}
                   transition={{ duration: 0.28, ease: [0.25, 1, 0.5, 1] }}
                   className="flex flex-col gap-4"
                 >
@@ -272,7 +313,9 @@ export const LoginModal: React.FC = () => {
                       id="modal-title"
                       className="text-[26px] font-bold text-[#111827]"
                     >
-                      {authMode === "login" ? "Log in to MY Bharat" : "Welcome to Mera Yuva Bharat!"}
+                      {authMode === "login"
+                        ? "Log in to MY Bharat"
+                        : "Welcome to Mera Yuva Bharat!"}
                     </h2>
                     <p className="text-[14px] font-medium text-[#6B7280]">
                       {authMode === "login"
@@ -281,12 +324,18 @@ export const LoginModal: React.FC = () => {
                     </p>
                   </div>
 
-                  <form onSubmit={handleSendOtp} className="flex flex-col gap-5 mt-2">
+                  <form
+                    onSubmit={handleSendOtp}
+                    className="flex flex-col gap-5 mt-2"
+                  >
                     <AuthInput
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={(e) => {
+                        setInputValue(e.target.value);
+                        setBackendError(null);
+                      }}
                       detectedType={detectedType}
-                      error={inputValue ? inputError : null}
+                      error={inputValue ? inputError || backendError : null}
                     />
 
                     <AuthButton
@@ -294,7 +343,9 @@ export const LoginModal: React.FC = () => {
                       isLoading={isLoading}
                       disabled={!isValid || isLoading}
                     >
-                      <span>{authMode === "login" ? "Log in with OTP" : "Send OTP"}</span>
+                      <span>
+                        {authMode === "login" ? "Log in with OTP" : "Send OTP"}
+                      </span>
                       <ArrowRight size={18} className="ml-1" />
                     </AuthButton>
                   </form>
@@ -379,7 +430,8 @@ export const LoginModal: React.FC = () => {
               >
                 <div className="flex flex-col gap-1">
                   <h2 className="text-[26px] font-bold text-[#111827]">
-                    Enter OTP sent via {detectedType === "email" ? "Email" : "SMS"}
+                    Enter OTP sent via{" "}
+                    {detectedType === "email" ? "Email" : "SMS"}
                   </h2>
                   <div className="flex items-center gap-1.5 text-[14px] font-medium text-[#6B7280]">
                     <span>We&apos;ve sent OTP to {cleanedValue}</span>
@@ -398,7 +450,10 @@ export const LoginModal: React.FC = () => {
                   </div>
                 </div>
 
-                <form onSubmit={handleVerifyOtp} className="flex flex-col gap-2 mt-2">
+                <form
+                  onSubmit={handleVerifyOtp}
+                  className="flex flex-col gap-2 mt-2"
+                >
                   <label className="text-[13px] font-bold text-[#374151]">
                     OTP
                   </label>
@@ -413,7 +468,10 @@ export const LoginModal: React.FC = () => {
                   {debugOtp && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-center">
                       <p className="text-[12px] font-semibold text-amber-800">
-                        Development OTP Code: <span className="font-bold tracking-widest text-amber-900">{debugOtp}</span>
+                        Development OTP Code:{" "}
+                        <span className="font-bold tracking-widest text-amber-900">
+                          {debugOtp}
+                        </span>
                       </p>
                     </div>
                   )}
